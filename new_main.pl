@@ -3,6 +3,10 @@
 #######################################
 here(bedroom).
 
+has(charged_bone).
+has(flask).
+has(fly).
+
 teleport(Location):-retract(here(_)),asserta(here(Location)).
 
 can_move_a(Location):-here(X),door(X,Location).
@@ -10,17 +14,31 @@ can_move_a(Location):-here(X),door(Location,X).
 can_move(Location):-can_move_a(Location),puzzle(Location),!.
 move(Location):-can_move(Location),retract(here(_)),asserta(here(Location)).
 
-list_inventory:-has(X),write(X),nl,fail; true.
-inventory:-write("Contents in inventory are:"),nl,list_inventory().
+list_inventory:-has(X),write(X),nl,fail.
+list_inventory(_).
+inventory:-write("Contents in inventory are:"),nl,list_inventory(),!.
 
 put(X):-has(X),retract(has(X)),here(Y),asserta(location(X,Y)).
 take(X):-here(Y),location(X,Y),retract(location(X,Y)),asserta(has(X)).
 
-make():-.
+has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c).
+write("Congratulations! You have successfully solved the towers of hanoi puzzle").
 
-has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),!.
-has_won:-write("Congratulations! You have successfully solved the towers of hanoi puzzle").
+can_transfer(disk,pylon1,pylon2):-true.
 
+near(E):-here(X),equipment(E),location(E,X).
+
+consume([]):-!.
+consume([H | T]):-retract(has(H)),consume(T).
+
+make_item(Item):-create_recipe(E,I,Item),near(E),has_ingredients(I), consume(I),asserta(has(Item)).
+
+
+has_ingredients([]):-!.
+has_ingredients([H | T]):- has(H), has_ingredients(T).
+
+
+transfer(disk,pylon1,pylon2):-can_transfer(disk,pylon1,pylon2).
 transfer(disk,pylon1,pylon2):-write('Transferring '), write(name(disk)),write(' from '),write(name(pylon1)),write(' to '),write(name(pylon2)).
 
 
