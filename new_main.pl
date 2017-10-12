@@ -18,8 +18,8 @@ take(X):-here(Y),location(X,Y),retract(location(X,Y)),asserta(has(X)).
 
 make():-.
 
-has_won():-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),!.
-has_won():-write("Congratulations! You have successfully solved the towers of hanoi puzzle").
+has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),!.
+has_won:-write("Congratulations! You have successfully solved the towers of hanoi puzzle").
 
 transfer(disk,pylon1,pylon2):-write('Transferring '), write(name(disk)),write(' from '),write(name(pylon1)),write(' to '),write(name(pylon2)).
 
