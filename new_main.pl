@@ -5,8 +5,9 @@ here(bedroom).
 
 teleport(Location):-retract(here(_)),asserta(here(Location)).
 
-can_move(Location):-here(X),door(X,Location).
-can_move(Location):-here(X),door(Location,X).
+can_move_a(Location):-here(X),door(X,Location).
+can_move_a(Location):-here(X),door(Location,X).
+can_move(Location):-can_move_a(Location),puzzle(Location),!.
 move(Location):-can_move(Location),retract(here(_)),asserta(here(Location)).
 
 list_inventory:-has(X),write(X),nl,fail; true.
@@ -15,6 +16,12 @@ inventory:-write("Contents in inventory are:"),nl,list_inventory().
 put(X):-has(X),retract(has(X)),here(Y),asserta(location(X,Y)).
 take(X):-here(Y),location(X,Y),retract(location(X,Y)),asserta(has(X)).
 
+make():-.
+
+has_won():-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),!.
+has_won():-write("Congratulations! You have successfully solved the towers of hanoi puzzle").
+
+transfer(disk,pylon1,pylon2):-write('Transferring '), write(name(disk)),write(' from '),write(name(pylon1)),write(' to '),write(name(pylon2)).
 
 
 %room connections are symmetric
