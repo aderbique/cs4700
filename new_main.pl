@@ -33,18 +33,20 @@ issmaller(small_disk,medium_disk).
 issmaller(small_disk,large_disk).
 issmaller(medium_disk,large_disk).
 
+isbigger(large_disk,medium_disk).
+isbigger(large_disk,small_disk).
+isbigger(medium_disk,small_disk).
+
 has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),write("Congratulations! You have successfully solved the towers of hanoi puzzle").
 
 
-
-
 is_top_disk(Disk):-location(Disk,Pylon),location(Y,Pylon),issmaller(Disk,Y).
+can_move_to(Disk,Pylon2):-location(Y,Pylon2),issmaller(Disk,Y).
+can_transfer(Disk,Pylon1,Pylon2):-location(Disk,Pylon1),is_top_disk(Disk).
 
-can_transfer(disk,pylon1,pylon2):location(disk,pylon1),is_top_disk(disk), issmaller(disk,Y).
-
-transfer(disk,pylon1,pylon2):-retract(location(disk,pylon1)),asserta(location(disk,pylon2)).
+transfer(Disk,Dylon1,Pylon2):-retract(location(Disk,pylon1)),asserta(location(Disk,Pylon2)).
 #transfer(disk,pylon1,pylon2):-can_transfer(disk,pylon1,pylon2),retract(location(disk,pylon1)),asserta(location(disk,pylon2)).
-transfer(disk,pylon1,pylon2):-write('Transferring '), write(name(disk)),write(' from '),write(name(pylon1)),write(' to '),write(name(pylon2)).
+transfer(Disk,Pylon1,Pylon2):-write('Transferring '), write(name(Disk)),write(' from '),write(name(Pylon1)),write(' to '),write(name(Pylon2)).
 
 
 %room connections are symmetric
@@ -85,3 +87,5 @@ study(X):-here(X),can_study(X).
 %allows prefix notation so 'look bedroom.' is the same as 'look(bedroom).'
 :-op(40,fx,look).
 :-op(45,fx,study).
+######Hello
+############
