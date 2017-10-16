@@ -79,8 +79,8 @@ location(bone,geology_building).
 location(fly,roommate_room).
 location(key,coat).
 location(coat,green_beam).
-location(large_disk,pylon_a).
-location(medium_disk,pylon_a).
+location(large_disk,pylon_c).
+location(medium_disk,pylon_c).
 location(small_disk,pylon_a).
 location(pylon_a,secret_lab).
 location(pylon_b,secret_lab).
@@ -165,7 +165,7 @@ short_desc(charged_bone,"A small piece of 'dragon' bone").
 short_desc(book_a,"a copy of 'Corpus Hermiticum' a book on alchemy").
 short_desc(book_b,"a copy of 'War and Peace'").
 short_desc(book_c,"a copy of 'Great Expectations'").
-short_desc(bunsen_burner,"A stand with a tube connected to a natural gas supply").
+short_desc(bunsen_burner,"A pƒstand with a tube connected to a natural gas supply").
 short_desc(chemistry_lab,"A lab with fume hoods and various chemical instuments").
 short_desc(closet,"Basically a hole in a wall").
 short_desc(coat,"A large white lab coat with lots of pockets").
@@ -271,4 +271,3 @@ puzzle(green_beam):-write("Dr. Sundberg escorts you out saying 'Sorry, this is a
 puzzle(_).
 
 read_words(W):-read_string(user_input,"\n\r","\n\r",_,L),split_string(L,"\t ","\t ",W).
-

@@ -1,11 +1,11 @@
 :-include(adventure).
 
 #######################################
-here(bedroom).
+here(secret_lab).
 
-has(charged_bone).
-has(flask).
-has(fly).
+#has(charged_bone).
+#has(flask).
+#has(fly).
 
 teleport(Location):-retract(here(_)),asserta(here(Location)).
 
@@ -37,16 +37,19 @@ isbigger(large_disk,medium_disk).
 isbigger(large_disk,small_disk).
 isbigger(medium_disk,small_disk).
 
-has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),write("Congratulations! You have successfully solved the towers of hanoi puzzle").
+has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c).
+win_message:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),nl,write("Congratulations! You have successfully solved the towers of hanoi puzzle").
+win_message().
 
 
-is_top_disk(Disk):-location(Disk,Pylon),location(Y,Pylon),issmaller(Disk,Y).
+is_top_disk(Disk):-location(Disk,Pylon),location(Y,Pylon),isbigger(Disk,Y).
 can_move_to(Disk,Pylon2):-location(Y,Pylon2),issmaller(Disk,Y).
-can_transfer(Disk,Pylon1,Pylon2):-location(Disk,Pylon1),is_top_disk(Disk).
+can_transfer(Disk,Pylon1,Pylon2):-location(Disk,Pylon1),\+ is_top_disk(Disk).
 
-transfer(Disk,Dylon1,Pylon2):-retract(location(Disk,pylon1)),asserta(location(Disk,Pylon2)).
+is_location:-here(X),location(pylon_a,X).
+
+transfer(Disk,Pylon1,Pylon2):-can_transfer(Disk,Pylon1,Pylon2),is_location(),retract(location(Disk,Pylon1)),asserta(location(Disk,Pylon2)),write('Transferring '), write(name(Disk)),write(' from '),write(name(Pylon1)),write(' to '),write(name(Pylon2)),win_message().
 #transfer(disk,pylon1,pylon2):-can_transfer(disk,pylon1,pylon2),retract(location(disk,pylon1)),asserta(location(disk,pylon2)).
-transfer(Disk,Pylon1,Pylon2):-write('Transferring '), write(name(Disk)),write(' from '),write(name(Pylon1)),write(' to '),write(name(Pylon2)).
 
 
 %room connections are symmetric
