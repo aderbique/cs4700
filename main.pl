@@ -1,12 +1,13 @@
-:-include(main).
+:-include(game).
 
 %Game Loop
-run:-nl,repeat,read_words(W),parse(C,W),Command=..C,Command,nl,has_won,!.
+run:-nl,repeat,read_words(W),parse(C,W),Command=..C,Command,nl,has_won.
   
 
-parse([V],L):-verb(V,L-[]),!.
-parse([V,N],L):-verb(V,L-NP), noun(N,NP - []),!.
-%parse([V,D,P1,P2],L):-verb(V,L-NP),noun(D,NP - RP), noun(P1, RP - QR), noun(P2, QR - []),!.
+parse([V],L):-verb(V,L-[]).
+parse([V,N],L):-verb(V,L-NP), noun(N,NP - []).
+parse([V,D,P1,P2],L):-verb(V,L-NP),noun(D,NP-RP),noun(P1,RP-XP),noun(P2,XP=[]).
+
 
 %!agricultural_science
 %!animal_science
@@ -195,6 +196,36 @@ noun(tunnels_west,["tunnels","west" | X] - X).
 %!potion
 %!recipe
 
+noun(pylon_a,["the","disk" | X] - X).
+noun(pylon_a,["pylon","a" | X] - X).
+noun(pylon_b,["pylon","b" | X] - X).
+noun(pylon_c,["pylon","c" | X] - X).
+noun(pylon_a,["red","pylon" | X] - X).
+noun(pylon_b,["blue","pylon" | X] - X).
+noun(pylon_c,["green","pylon" | X] - X).
+
+noun(pylon_a,["to","the","disk" | X] - X).
+noun(pylon_a,["to","pylon","a" | X] - X).
+noun(pylon_b,["to","pylon","b" | X] - X).
+noun(pylon_c,["to","pylon","c" | X] - X).
+noun(pylon_a,["to","red","pylon" | X] - X).
+noun(pylon_b,["to","blue","pylon" | X] - X).
+noun(pylon_c,["to","green","pylon" | X] - X).
+
+noun(pylon_a,["from","the","disk" | X] - X).
+noun(pylon_a,["from","pylon","a" | X] - X).
+noun(pylon_b,["from","pylon","b" | X] - X).
+noun(pylon_c,["from","pylon","c" | X] - X).
+noun(pylon_a,["from","red","pylon" | X] - X).
+noun(pylon_b,["from","blue","pylon" | X] - X).
+noun(pylon_c,["from","green","pylon" | X] - X).
+
+noun(pylon_a,["the","pylon","a" | X] - X).
+noun(pylon_b,["the","pylon","b" | X] - X).
+noun(pylon_c,["the","pylon","c" | X] - X).
+noun(pylon_a,["the","red","pylon" | X] - X).
+noun(pylon_b,["the","blue","pylon" | X] - X).
+noun(pylon_c,["the","green","pylon" | X] - X).
 
 noun(bone,["bone" | X] - X).
 noun(book_a,["book","a" | X] - X).
@@ -219,7 +250,7 @@ noun(flask,["flask" | X] - X).
 noun(fly,["fly" | X] - X).
 noun(fly,["a","dead","fly" | X] - X).
 noun(fly,["a","fly" | X] - X).
-noun(fly,["the","dead",fly" | X] - X).
+noun(fly,["the","dead","fly" | X] - X).
 noun(goggles,["goggles" | X] - X).
 noun(green_beam,["green","beam" | X] - X).
 noun(green_beam,["green_beam" | X] - X).

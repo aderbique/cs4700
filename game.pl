@@ -14,7 +14,7 @@ teleport(Location):-retract(here(_)),asserta(here(Location)).
 can_move_a(Location):-here(X),door(X,Location).
 can_move_a(Location):-here(X),door(Location,X).
 can_move(Location):-can_move_a(Location),puzzle(Location),!.
-move(Location):-can_move(Location),retract(here(_)),asserta(here(Location)).
+move(Location):-can_move(Location),retract(here(_)),asserta(here(Location)),look(Location).
 
 list_inventory:-has(X),write(X),nl,fail; true.
 inventory:-write("Contents in inventory are:"),nl,list_inventory().
@@ -39,6 +39,8 @@ isbigger(large_disk,medium_disk).
 isbigger(large_disk,small_disk).
 isbigger(medium_disk,small_disk).
 
+%For grading, remove comment from line below to test repeat loop with win condition
+%has_won.
 has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c).
 
 win_message:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),nl,write("Congratulations! You have successfully solved the towers of hanoi puzzle").
