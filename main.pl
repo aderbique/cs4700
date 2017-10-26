@@ -38,6 +38,7 @@ isbigger(large_disk,small_disk).
 isbigger(medium_disk,small_disk).
 
 has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c).
+
 win_message:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),nl,write("Congratulations! You have successfully solved the towers of hanoi puzzle").
 win_message().
 
