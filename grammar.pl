@@ -1,12 +1,12 @@
 :-include(main).
 
 %Game Loop
-run:-write("test"),nl,repeat,read_words(W),parse(C,W),Command=C,do(C),nl,has_won,!.
+run:-nl,repeat,read_words(W),parse(C,W),Command=..C,Command,nl,has_won,!.
   
 
 parse([V],L):-verb(V,L-[]),!.
 parse([V,N],L):-verb(V,L-NP), noun(N,NP - []),!.
-%parse([V,D,P1,P2],L):-verb(V,L-NP),noun(D,RL - RP), noun(P1, QL - QR), noun(P2, AR - []),!.
+%parse([V,D,P1,P2],L):-verb(V,L-NP),noun(D,NP - RP), noun(P1, RP - QR), noun(P2, QR - []),!.
 
 %!agricultural_science
 %!animal_science
@@ -30,7 +30,7 @@ parse([V,N],L):-verb(V,L-NP), noun(N,NP - []),!.
 %!observatory
 %!old_main
 %!plaza
-%!quad
+%!quazd
 %!roof
 %!roommate_room
 %!secret_lab
@@ -42,6 +42,20 @@ parse([V,N],L):-verb(V,L-NP), noun(N,NP - []),!.
 %!tunnels_east
 %!tunnels_north
 %!tunnels_west
+
+%Context sensitive sentences "Walk outside"
+noun(plaza,["outside" | X] - X):-here(avenue).
+noun(plaza,["outside" | X] - X):-here(common_room).
+noun(plaza,["outside" | X] - X):-here(engr).
+noun(plaza,["outside" | X] - X):-here(ser_1st_floor).
+noun(quad,["outside" | X] - X):-here(agricultural_science).
+noun(quad,["outside" | X] - X):-here(animal_science).
+noun(quad,["outside" | X] - X):-here(eslc_south).
+noun(quad,["outside" | X] - X):-here(geology_building).
+noun(quad,["outside" | X] - X):-here(old_main).
+noun(quad,["outside" | X] - X):-here(tsc_patio).
+noun(roof,["outside" | X] - X):-here(observatory).
+noun(tsc_patio,["outside" | X] - X):-here(tsc).
 
 
 noun(agricultural_science,["the","agricultural","science" | X] - X).
@@ -82,7 +96,7 @@ noun(quad,["the","quad" | X] - X).
 noun(roof,["the","roof" | X] - X).
 noun(roof,["the","rooftop" | X] - X).
 noun(roommate_room,["the","roommate","room" | X] - X).
-noun(roommate_room,["the","roommate's","room" | X] - X).
+noun(roommate_room,["the","roommates","room" | X] - X).
 noun(secret_lab,["the","secret","lab" | X] - X).
 noun(secret_lab,["the","secret","laboratory" | X] - X).
 noun(ser_1st_floor,["the","ser","first","floor" | X] - X).
@@ -138,7 +152,7 @@ noun(quad,["quad" | X] - X).
 noun(roof,["roof" | X] - X).
 noun(roof,["rooftop" | X] - X).
 noun(roommate_room,["roommate","room" | X] - X).
-noun(roommate_room,["roommate's","room" | X] - X).
+noun(roommate_room,["roommates","room" | X] - X).
 noun(secret_lab,["secret","lab" | X] - X).
 noun(secret_lab,["secret","laboratory" | X] - X).
 noun(ser_1st_floor,["ser","first","floor" | X] - X).
@@ -203,6 +217,9 @@ noun(dirty_clothes,["dirty","clothes" | X] - X).
 noun(figurine,["figurine" | X] - X).
 noun(flask,["flask" | X] - X).
 noun(fly,["fly" | X] - X).
+noun(fly,["a","dead","fly" | X] - X).
+noun(fly,["a","fly" | X] - X).
+noun(fly,["the","dead",fly" | X] - X).
 noun(goggles,["goggles" | X] - X).
 noun(green_beam,["green","beam" | X] - X).
 noun(green_beam,["green_beam" | X] - X).
@@ -419,19 +436,3 @@ verb(quit,["stop" | X] - X).
 %!toward
 %!up
 
-
-%Context sensitive sentences "Walk outside"
-noun(plaza,["outside" | X] - X):-here(common_room).
-noun(quad,["outside" | X] - X):-here(avenue).
-noun(plaza,["outside" | X] - X):-here(avenue).
-noun(plaza,["outside" | X] - X):-here(common_room).
-noun(plaza,["outside" | X] - X):-here(engr).
-noun(plaza,["outside" | X] - X):-here(ser_1st_floor).
-noun(quad,["outside" | X] - X):-here(agricultural_science).
-noun(quad,["outside" | X] - X):-here(animal_science).
-noun(quad,["outside" | X] - X):-here(eslc_south).
-noun(quad,["outside" | X] - X):-here(geology_building).
-noun(quad,["outside" | X] - X):-here(old_main).
-noun(quad,["outside" | X] - X):-here(tsc_patio).
-noun(roof,["outside" | X] - X):-here(observatory).
-noun(tsc_patio,["outside" | X] - X):-here(tsc).

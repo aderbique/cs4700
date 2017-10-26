@@ -1,11 +1,13 @@
 :-include(adventure).
 
-#######################################
-here(secret_lab).
+%#######################################
+%here(secret_lab).
 
-#has(charged_bone).
-#has(flask).
-#has(fly).
+%has(charged_bone).
+%has(flask).
+%has(fly).
+
+quit(_):-retract(has_won),asserta(has_won).
 
 teleport(Location):-retract(here(_)),asserta(here(Location)).
 
@@ -45,12 +47,12 @@ win_message().
 
 is_top_disk(Disk):-location(Disk,Pylon),location(Y,Pylon),isbigger(Disk,Y).
 can_move_to(Disk,Pylon2):-location(Y,Pylon2),issmaller(Disk,Y).
-can_transfer(Disk,Pylon1,Pylon2):-location(Disk,Pylon1),\+ is_top_disk(Disk).
+can_transfer(Disk,Pylon1):-location(Disk,Pylon1),\+ is_top_disk(Disk).
 
 is_location:-here(X),location(pylon_a,X).
 
-transfer(Disk,Pylon1,Pylon2):-can_transfer(Disk,Pylon1,Pylon2),is_location(),retract(location(Disk,Pylon1)),asserta(location(Disk,Pylon2)),write('Transferring '), write(name(Disk)),write(' from '),write(name(Pylon1)),write(' to '),write(name(Pylon2)),win_message().
-#transfer(disk,pylon1,pylon2):-can_transfer(disk,pylon1,pylon2),retract(location(disk,pylon1)),asserta(location(disk,pylon2)).
+transfer(Disk,Pylon1,Pylon2):-can_transfer(Disk,Pylon1),is_location(),retract(location(Disk,Pylon1)),asserta(location(Disk,Pylon2)),write('Transferring '), write(name(Disk)),write(' from '),write(name(Pylon1)),write(' to '),write(name(Pylon2)),win_message().
+%transfer(disk,pylon1,pylon2):-can_transfer(disk,pylon1),retract(location(disk,pylon1)),asserta(location(disk,pylon2)).
 
 
 %room connections are symmetric
@@ -88,8 +90,7 @@ can_study(Thing):-write_name(Thing),write(" :"),nl,write_long(Thing),!.
 study(X):-location(X,here(_)),can_study(X).
 study(X):-here(X),can_study(X).
 
+
 %allows prefix notation so 'look bedroom.' is the same as 'look(bedroom).'
 :-op(40,fx,look).
 :-op(45,fx,study).
-######Hello
-############
