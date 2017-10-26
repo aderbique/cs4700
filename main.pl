@@ -1,96 +1,438 @@
-:-include(adventure).
+:-include(main).
 
-%#######################################
-%here(secret_lab).
+%Game Loop
+run:-nl,repeat,read_words(W),parse(C,W),Command=..C,Command,nl,has_won,!.
+  
 
-%has(charged_bone).
-%has(flask).
-%has(fly).
+parse([V],L):-verb(V,L-[]),!.
+parse([V,N],L):-verb(V,L-NP), noun(N,NP - []),!.
+%parse([V,D,P1,P2],L):-verb(V,L-NP),noun(D,NP - RP), noun(P1, RP - QR), noun(P2, QR - []),!.
 
-quit(_):-retract(has_won),asserta(has_won).
+%!agricultural_science
+%!animal_science
+%!avenue
+%!bedroom
+%!bedroom_closet
+%!chemistry_lab
+%!closet
+%!common_room
+%!computer_lab
+%!elevator
+%!engr
+%!eslc_north
+%!eslc_south
+%!geology_building
+%!hall
+%!hub
+%!kitchen
+%!laser_lab
+%!library
+%!observatory
+%!old_main
+%!plaza
+%!quazd
+%!roof
+%!roommate_room
+%!secret_lab
+%!ser_1st_floor
+%!ser_2nd_floor
+%!special_collections
+%!tsc
+%!tsc_patio
+%!tunnels_east
+%!tunnels_north
+%!tunnels_west
 
-teleport(Location):-retract(here(_)),asserta(here(Location)).
-
-can_move_a(Location):-here(X),door(X,Location).
-can_move_a(Location):-here(X),door(Location,X).
-can_move(Location):-can_move_a(Location),puzzle(Location),!.
-move(Location):-can_move(Location),retract(here(_)),asserta(here(Location)).
-
-list_inventory:-has(X),write(X),nl,fail; true.
-inventory:-write("Contents in inventory are:"),nl,list_inventory().
-
-put(X):-has(X),retract(has(X)),here(Y),asserta(location(X,Y)).
-take(X):-here(Y),location(X,Y),retract(location(X,Y)),asserta(has(X)).
-
-near(E):-here(X),equipment(E),location(E,X).
-
-consume([]):-!.
-consume([H | T]):-retract(has(H)),consume(T).
-
-make_item(Item):-create_recipe(E,I,Item),near(E),has_ingredients(I), consume(I),asserta(has(Item)).
-has_ingredients([]):-!.
-has_ingredients([H | T]):- has(H), has_ingredients(T).
-
-issmaller(small_disk,medium_disk).
-issmaller(small_disk,large_disk).
-issmaller(medium_disk,large_disk).
-
-isbigger(large_disk,medium_disk).
-isbigger(large_disk,small_disk).
-isbigger(medium_disk,small_disk).
-
-has_won:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c).
-
-win_message:-location(large_disk,pylon_c),location(medium_disk,pylon_c),location(small_disk,pylon_c),nl,write("Congratulations! You have successfully solved the towers of hanoi puzzle").
-win_message().
-
-
-is_top_disk(Disk):-location(Disk,Pylon),location(Y,Pylon),isbigger(Disk,Y).
-can_move_to(Disk,Pylon2):-location(Y,Pylon2),issmaller(Disk,Y).
-can_transfer(Disk,Pylon1):-location(Disk,Pylon1),\+ is_top_disk(Disk).
-
-is_location:-here(X),location(pylon_a,X).
-
-transfer(Disk,Pylon1,Pylon2):-can_transfer(Disk,Pylon1),is_location(),retract(location(Disk,Pylon1)),asserta(location(Disk,Pylon2)),write('Transferring '), write(name(Disk)),write(' from '),write(name(Pylon1)),write(' to '),write(name(Pylon2)),win_message().
-%transfer(disk,pylon1,pylon2):-can_transfer(disk,pylon1),retract(location(disk,pylon1)),asserta(location(disk,pylon2)).
-
-
-%room connections are symmetric
-connection(X,Y):-door(X,Y).
-connection(X,Y):-door(Y,X).
-
-%Write only the first name or description found
-write_name(Object):-name(Object,N),write(N),!.
-write_short(Object):-short_desc(Object,Desc),write(Desc),!.
-write_long(Object):-long_desc(Object,Desc),write(Desc),!.
-
-%List out all child objects of a location (may be a room or a container
-list_things(Place):-location(X,Place),tab(2),write_name(X),write(" -"),tab(1),write_short(X),nl,fail.
-list_things(_).
-
-%List out all connections of a room
-list_connections(Place):-connection(X,Place),tab(2),write_name(X),write(" -"),tab(1),write_short(X),nl,fail.
-list_connections(_).
-
-%Unchecked (always successful) version of look action
-search(Place):-room(Place),write_name(Place),write(" :"),nl,write_long(Place),nl,
-write('You see: '),nl,list_things(Place),write('You can go to: '),nl,list_connections(Place),!.
-search(Container):-container(Container),write_name(Container),write(" :"),nl,write_short(Container),nl,write("It seems there may be something inside."),!.
-search(Thing):-write_name(Thing),write(" :"),nl,write_short(Thing),!.
-
-%Look with no arguments means look here.
-look:-here(Place),search(Place).
-look(Location):-here(Location),search(Location).
-
-%Unchecked (always successful) version of study action
-can_study(Place):-room(Place),look(Place),!.
-can_study(Container):-container(Container),write_name(Container),write(" :"),nl,write_long(Container),nl,list_things(Container),!.
-can_study(Thing):-write_name(Thing),write(" :"),nl,write_long(Thing),!.
-
-study(X):-location(X,here(_)),can_study(X).
-study(X):-here(X),can_study(X).
+%Context sensitive sentences "Walk outside"
+noun(plaza,["outside" | X] - X):-here(avenue).
+noun(plaza,["outside" | X] - X):-here(common_room).
+noun(plaza,["outside" | X] - X):-here(engr).
+noun(plaza,["outside" | X] - X):-here(ser_1st_floor).
+noun(quad,["outside" | X] - X):-here(agricultural_science).
+noun(quad,["outside" | X] - X):-here(animal_science).
+noun(quad,["outside" | X] - X):-here(eslc_south).
+noun(quad,["outside" | X] - X):-here(geology_building).
+noun(quad,["outside" | X] - X):-here(old_main).
+noun(quad,["outside" | X] - X):-here(tsc_patio).
+noun(roof,["outside" | X] - X):-here(observatory).
+noun(tsc_patio,["outside" | X] - X):-here(tsc).
 
 
-%allows prefix notation so 'look bedroom.' is the same as 'look(bedroom).'
-:-op(40,fx,look).
-:-op(45,fx,study).
+noun(agricultural_science,["the","agricultural","science" | X] - X).
+noun(animal_science,["the","animal","science" | X] - X).
+noun(avenue,["the","avenue" | X] - X).
+noun(bedroom,["the","bedroom" | X] - X).
+noun(bedroom,["the","bed","room" | X] - X).
+noun(bedroom_closet,["the","bedroom","closet" | X] - X).
+noun(bedroom_closet,["the","bed","room","closet" | X] - X).
+noun(chemistry_lab,["the","chemistry","lab" | X] - X).
+noun(chemistry_lab,["the","chem","lab" | X] - X).
+noun(chemistry_lab,["the","chemistry","laboratory" | X] - X).
+noun(closet,["the","closet" | X] - X).
+noun(common_room,["the","common","room" | X] - X).
+noun(computer_lab,["the","computer","lab" | X] - X).
+noun(computer_lab,["the","computer","laboratory" | X] - X).
+noun(elevator,["the","elevator" | X] - X).
+noun(engr,["the","engr" | X] - X).
+noun(engr,["the","engineering" | X] - X).
+noun(engr,["the","ENGR" | X] - X).
+noun(eslc_south,["the","eslc","south" | X] - X).
+noun(eslc_north,["the","eslc","north" | X] - X).
+noun(geology_building,["the","geology" | X] - X).
+noun(geology_building,["the","geology","building" | X] - X).
+noun(hall,["the","hall" | X] - X).
+noun(hall,["the","hallway" | X] - X).
+noun(hub,["the","hub" | X] - X).
+noun(hub,["the","tsc","hub" | X] - X).
+noun(kitchen,["the","kitchen" | X] - X).
+noun(laser_lab,["the","laser","laboratory" | X] - X).
+noun(laser_lab,["the","laser","lab" | X] - X).
+noun(library,["the","library" | X] - X).
+noun(library,["the","lib" | X] - X).
+noun(observatory,["the","observatory" | X] - X).
+noun(old_main,["the","old","main" | X] - X).
+noun(plaza,["the","plaza" | X] - X).
+noun(quad,["the","quad" | X] - X).
+noun(roof,["the","roof" | X] - X).
+noun(roof,["the","rooftop" | X] - X).
+noun(roommate_room,["the","roommate","room" | X] - X).
+noun(roommate_room,["the","roommates","room" | X] - X).
+noun(secret_lab,["the","secret","lab" | X] - X).
+noun(secret_lab,["the","secret","laboratory" | X] - X).
+noun(ser_1st_floor,["the","ser","first","floor" | X] - X).
+noun(ser_1st_floor,["the","ser","1st","floor" | X] - X).
+noun(ser_2nd_floor,["the","ser","second","floor" | X] - X).
+noun(ser_2nd_floor,["the","ser","2nd","floor" | X] - X).
+noun(tsc,["the","tsc" | X] - X).
+noun(tsc,["the","taggard","student","center" | X] - X).
+noun(tsc_patio,["the","tsc","patio" | X] - X).
+noun(tsc_patio,["the","taggart","student","center patio" | X] - X).
+noun(tunnels_east,["the","tunnels","east" | X] - X).
+noun(tunnels_east,["the","tunnel","east" | X] - X).
+noun(tunnels_north,["the","tunnels","north" | X] - X).
+noun(tunnels_north,["the","tunnel","north" | X] - X).
+noun(tunnels_west,["the","tunnel","west" | X] - X).
+noun(tunnels_west,["the","tunnels","west" | X] - X).
+
+noun(agricultural_science,["agricultural","science" | X] - X).
+noun(animal_science,["animal","science" | X] - X).
+noun(avenue,["avenue" | X] - X).
+noun(bedroom,["bedroom" | X] - X).
+noun(bedroom,["bed","room" | X] - X).
+noun(bedroom_closet,["bedroom","closet" | X] - X).
+noun(bedroom_closet,["bed","room","closet" | X] - X).
+noun(chemistry_lab,["chemistry","lab" | X] - X).
+noun(chemistry_lab,["chem","lab" | X] - X).
+noun(chemistry_lab,["chemistry","laboratory" | X] - X).
+noun(closet,["closet" | X] - X).
+noun(common_room,["common","room" | X] - X).
+noun(computer_lab,["computer","lab" | X] - X).
+noun(computer_lab,["computer","laboratory" | X] - X).
+noun(elevator,["elevator" | X] - X).
+noun(engr,["engr" | X] - X).
+noun(engr,["engineering" | X] - X).
+noun(engr,["ENGR" | X] - X).
+noun(eslc_south,["eslc","south" | X] - X).
+noun(eslc_north,["eslc","north" | X] - X).
+noun(geology_building,["geology" | X] - X).
+noun(geology_building,["geology","building" | X] - X).
+noun(hall,["hall" | X] - X).
+noun(hall,["hallway" | X] - X).
+noun(hub,["hub" | X] - X).
+noun(hub,["tsc","hub" | X] - X).
+noun(kitchen,["kitchen" | X] - X).
+noun(laser_lab,["laser","laboratory" | X] - X).
+noun(laser_lab,["laser","lab" | X] - X).
+noun(library,["library" | X] - X).
+noun(library,["lib" | X] - X).
+noun(observatory,["observatory" | X] - X).
+noun(old_main,["old","main" | X] - X).
+noun(plaza,["plaza" | X] - X).
+noun(quad,["quad" | X] - X).
+noun(roof,["roof" | X] - X).
+noun(roof,["rooftop" | X] - X).
+noun(roommate_room,["roommate","room" | X] - X).
+noun(roommate_room,["roommates","room" | X] - X).
+noun(secret_lab,["secret","lab" | X] - X).
+noun(secret_lab,["secret","laboratory" | X] - X).
+noun(ser_1st_floor,["ser","first","floor" | X] - X).
+noun(ser_1st_floor,["ser","1st","floor" | X] - X).
+noun(ser_2nd_floor,["ser","second","floor" | X] - X).
+noun(ser_2nd_floor,["ser","2nd","floor" | X] - X).
+noun(tsc,["tsc" | X] - X).
+noun(tsc,["taggard","student","center" | X] - X).
+noun(tsc_patio,["tsc","patio" | X] - X).
+noun(tsc_patio,["taggart","student","center patio" | X] - X).
+noun(tunnels_east,["tunnels","east" | X] - X).
+noun(tunnels_east,["tunnel","east" | X] - X).
+noun(tunnels_north,["tunnels","north" | X] - X).
+noun(tunnels_north,["tunnel","north" | X] - X).
+noun(tunnels_west,["tunnel","west" | X] - X).
+noun(tunnels_west,["tunnels","west" | X] - X).
+
+
+%objects
+%!bone
+%!book_a
+%!book_b
+%!book_c
+%!bunsen_burner
+%!charged_bone
+%!clean_clothes
+%!coat
+%!dirty_clothes
+%!figurine
+%!flask
+%!fly
+%!goggles
+%!green_beam
+%!ice_cream
+%!key
+%!laser
+%!lost_homework
+%!movie
+%!note
+%!potion
+%!recipe
+
+
+noun(bone,["bone" | X] - X).
+noun(book_a,["book","a" | X] - X).
+noun(book_a,["book_a" | X] - X).
+noun(book_b,["book_b" | X] - X).
+noun(book_b,["book","b" | X] - X).
+noun(book_c,["book_c)" | X] - X).
+noun(book_c,["book","c" | X] - X).
+noun(bunsen_burner,["bunsen","burner" | X] - X).
+noun(bunsen_burner,["bunsen_burner" | X] - X).
+noun(charged_bone,["charged_bone" | X] - X).
+noun(charged_bone,["charged","bone" | X] - X).
+noun(clean_clothes,["clean_clothes" | X] - X).
+noun(clean_clothes,["clean","clothes" | X] - X).
+noun(coat,["coat" | X] - X).
+noun(coat,["sweater" | X] - X).
+noun(coat,["jacket" | X] - X).
+noun(dirty_clothes,["dirty_clothes" | X] - X).
+noun(dirty_clothes,["dirty","clothes" | X] - X).
+noun(figurine,["figurine" | X] - X).
+noun(flask,["flask" | X] - X).
+noun(fly,["fly" | X] - X).
+noun(fly,["a","dead","fly" | X] - X).
+noun(fly,["a","fly" | X] - X).
+noun(fly,["the","dead",fly" | X] - X).
+noun(goggles,["goggles" | X] - X).
+noun(green_beam,["green","beam" | X] - X).
+noun(green_beam,["green_beam" | X] - X).
+noun(ice_cream,["ice_cream" | X] - X).
+noun(ice_cream,["ice","cream" | X] - X).
+noun(key,["key" | X] - X).
+noun(laser,["laser" | X] - X).
+noun(lost_homework,["lost_homework" | X] - X).
+noun(lost_homework,["lost","homework" | X] - X).
+noun(movie,["movie" | X] - X).
+noun(note,["note" | X] - X).
+noun(potion,["potion" | X] - X).
+noun(recipe,["recipe" | X] - X).
+
+
+noun(bone,["a","bone" | X] - X).
+noun(book_a,["a","book","a" | X] - X).
+noun(book_a,["a","book_a" | X] - X).
+noun(book_b,["a","book_b" | X] - X).
+noun(book_b,["a","book","b" | X] - X).
+noun(book_c,["a","book_c)" | X] - X).
+noun(book_c,["a","book","c" | X] - X).
+noun(bunsen_burner,["a","bunsen","burner" | X] - X).
+noun(bunsen_burner,["a","bunsen_burner" | X] - X).
+noun(charged_bone,["a","charged_bone" | X] - X).
+noun(charged_bone,["a","charged","bone" | X] - X).
+noun(clean_clothes,["a","clean_clothes" | X] - X).
+noun(clean_clothes,["a","clean","clothes" | X] - X).
+noun(coat,["a","coat" | X] - X).
+noun(coat,["a","sweater" | X] - X).
+noun(coat,["a","jacket" | X] - X).
+noun(dirty_clothes,["a","dirty_clothes" | X] - X).
+noun(dirty_clothes,["a","dirty","clothes" | X] - X).
+noun(figurine,["a","figurine" | X] - X).
+noun(flask,["a","flask" | X] - X).
+noun(fly,["a","fly" | X] - X).
+noun(goggles,["a","goggles" | X] - X).
+noun(green_beam,["a","green","beam" | X] - X).
+noun(green_beam,["a","green_beam" | X] - X).
+noun(ice_cream,["a","ice_cream" | X] - X).
+noun(ice_cream,["a","ice","cream" | X] - X).
+noun(key,["a","key" | X] - X).
+noun(laser,["a","laser" | X] - X).
+noun(lost_homework,["a","lost_homework" | X] - X).
+noun(lost_homework,["a","lost","homework" | X] - X).
+noun(movie,["a","movie" | X] - X).
+noun(note,["a","note" | X] - X).
+noun(potion,["a","potion" | X] - X).
+noun(recipe,["a","recipe" | X] - X).
+
+noun(bone,["an","bone" | X] - X).
+noun(book_a,["an","book","a" | X] - X).
+noun(book_a,["an","book_a" | X] - X).
+noun(book_b,["an","book_b" | X] - X).
+noun(book_b,["an","book","b" | X] - X).
+noun(book_c,["an","book_c)" | X] - X).
+noun(book_c,["an","book","c" | X] - X).
+noun(bunsen_burner,["an","bunsen","burner" | X] - X).
+noun(bunsen_burner,["an","bunsen_burner" | X] - X).
+noun(charged_bone,["an","charged_bone" | X] - X).
+noun(charged_bone,["an","charged","bone" | X] - X).
+noun(clean_clothes,["an","clean_clothes" | X] - X).
+noun(clean_clothes,["an","clean","clothes" | X] - X).
+noun(coat,["an","coat" | X] - X).
+noun(coat,["an","sweater" | X] - X).
+noun(coat,["an","jacket" | X] - X).
+noun(dirty_clothes,["an","dirty_clothes" | X] - X).
+noun(dirty_clothes,["an","dirty","clothes" | X] - X).
+noun(figurine,["an","figurine" | X] - X).
+noun(flask,["an","flask" | X] - X).
+noun(fly,["an","fly" | X] - X).
+noun(goggles,["an","goggles" | X] - X).
+noun(green_beam,["an","green","beam" | X] - X).
+noun(green_beam,["an","green_beam" | X] - X).
+noun(ice_cream,["an","ice_cream" | X] - X).
+noun(ice_cream,["an","ice","cream" | X] - X).
+noun(key,["an","key" | X] - X).
+noun(laser,["an","laser" | X] - X).
+noun(lost_homework,["an","lost_homework" | X] - X).
+noun(lost_homework,["an","lost","homework" | X] - X).
+noun(movie,["an","movie" | X] - X).
+noun(note,["an","note" | X] - X).
+noun(potion,["an","potion" | X] - X).
+noun(recipe,["an","recipe" | X] - X).
+
+noun(bone,["the","bone" | X] - X).
+noun(book_a,["the","book","a" | X] - X).
+noun(book_a,["the","book_a" | X] - X).
+noun(book_b,["the","book_b" | X] - X).
+noun(book_b,["the","book","b" | X] - X).
+noun(book_c,["the","book_c)" | X] - X).
+noun(book_c,["the","book","c" | X] - X).
+noun(bunsen_burner,["the","bunsen","burner" | X] - X).
+noun(bunsen_burner,["the","bunsen_burner" | X] - X).
+noun(charged_bone,["the","charged_bone" | X] - X).
+noun(charged_bone,["the","charged","bone" | X] - X).
+noun(clean_clothes,["the","clean_clothes" | X] - X).
+noun(clean_clothes,["the","clean","clothes" | X] - X).
+noun(coat,["the","coat" | X] - X).
+noun(coat,["the","sweater" | X] - X).
+noun(coat,["the","jacket" | X] - X).
+noun(dirty_clothes,["the","dirty_clothes" | X] - X).
+noun(dirty_clothes,["the","dirty","clothes" | X] - X).
+noun(figurine,["the","figurine" | X] - X).
+noun(flask,["the","flask" | X] - X).
+noun(fly,["the","fly" | X] - X).
+noun(goggles,["the","goggles" | X] - X).
+noun(green_beam,["the","green","beam" | X] - X).
+noun(green_beam,["the","green_beam" | X] - X).
+noun(ice_cream,["the","ice_cream" | X] - X).
+noun(ice_cream,["the","ice","cream" | X] - X).
+noun(key,["the","key" | X] - X).
+noun(laser,["the","laser" | X] - X).
+noun(lost_homework,["the","lost_homework" | X] - X).
+noun(lost_homework,["the","lost","homework" | X] - X).
+noun(movie,["the","movie" | X] - X).
+noun(note,["the","note" | X] - X).
+noun(potion,["the","potion" | X] - X).
+noun(recipe,["the","recipe" | X] - X).
+
+%!All actions recognizable by function
+%!move
+%!put
+%!take
+%!look
+%!study
+%!quit
+%!inventory
+%!transfer
+%make
+
+verb(move,["move" | X] - X).
+verb(put, ["put" | X] - X).
+verb(take, ["take" | X] - X).
+verb(look, ["look" | X] - X).
+verb(study, ["study" | X] - X).
+verb(quit, ["quit" | X] - X).
+verb(inventory, ["inventory"]).
+verb(transer, ["transfer" | X] - X).
+
+verb(move,["climb" | X] - X).
+verb(move,["go" | X] - X).
+verb(move,["head" | X] - X).
+verb(move,["run" | X] - X).
+verb(move,["travel" | X] - X).
+verb(move,["walk" | X] - X).
+verb(move,["skip" | X] - X).
+
+verb(take,["take" | X] - X).
+verb(take,["steal" | X] - X).
+verb(take,["pick" | X] - X).
+verb(take,["grab" | X] - X).
+verb(put,["place" | X] - X).
+verb(put,["drop" | X] - X).
+verb(put,["put" | X] - X).
+
+verb(move,["go","to" | X] - X).
+verb(move,["go","the" | X] - X).
+verb(move,["go","to","the" | X] - X).
+verb(move,["move","to" | X] - X).
+verb(move,["move","the" | X] - X).
+verb(move,["move","to","the" | X] - X).
+verb(put, ["put","the" | X] - X).
+verb(take, ["take","the" | X] - X).
+verb(look, ["look","at" | X] - X).
+verb(look, ["look","at","the" | X] - X).
+verb(study, ["study","the" | X] - X).
+verb(quit, ["quit","the" | X] - X).
+verb(inventory, ["inventory"]).
+verb(transer, ["transfer","the" | X] - X).
+
+
+verb(move,["climb","the" | X] - X).
+verb(move,["go","the" | X] - X).
+verb(move,["head","the" | X] - X).
+verb(move,["run","the" | X] - X).
+verb(move,["travel","the" | X] - X).
+verb(move,["travel","to" | X] - X).
+verb(move,["travel","to","the" | X] - X).
+verb(move,["walk","to" | X] - X).
+verb(move,["skip","to" | X] - X).
+
+verb(take,["take","the" | X] - X).
+verb(take,["steal","the" | X] - X).
+verb(take,["pick","up" | X] - X).
+verb(take,["pick","up","a" | X] - X).
+verb(take,["pick","up","the" | X] - X).
+verb(take,["pick","the" | X] - X).
+verb(take,["grab","the" | X] - X).
+verb(put,["place","the" | X] - X).
+verb(put,["drop","the" | X] - X).
+verb(put,["put","the" | X] - X).
+
+verb(look,["look" | X] - X).
+verb(look,["look","at" | X] - X).
+verb(look,["look","at","the" | X] - X).
+verb(inventory,["inventory" | X] - X).
+verb(inventory,["inv" | X] - X).
+verb(quit,["quit" | X] - X).
+verb(quit,["exit" | X] - X).
+verb(quit,["kill" | X] - X).
+verb(quit,["halt" | X] - X).
+verb(quit,["stop" | X] - X).
+
+
+%!don't care about these words
+%!a
+%!an
+%!around
+%!in
+%!inside
+%!the
+%!to
+%!toward
+%!up
+

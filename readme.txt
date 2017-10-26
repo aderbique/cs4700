@@ -3,7 +3,7 @@ This was week.pl with additions for the third prolog assignment.
 A01967241 10/26/17
 CS4700
 
-
+Load up main
 Entry Point: run.
 Game loop works. If you change the has_won  on line 42 of main.pl,
 you will see that the loop does not run.
